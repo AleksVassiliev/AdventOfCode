@@ -4,44 +4,14 @@ def test_partA():
     assert(stepsCount("ne,ne,s,s") == 2)
     assert(stepsCount("se,sw,se,sw,sw") == 3)
 
-'''
-pathBack = [ ["n", "s"], ["ne", "sw"], ["nw", "se"] ]
-pathSide = { "n": ["nw", "ne"], "ne": ["n", "se"], "se": ["ne", "s"], "s": ["se", "sw"], "sw": ["s", "nw"], "nw": ["sw", "n"] }
-
-
-def isBackStep(prevStep, step):
-    if prevStep != step:
-        for path in pathBack:
-            if (prevStep in path) and (step in path):
-                return True
-    return False
-
-
-def isSideStep(prevStep, step):
-    path = pathSide[step]
-    if prevStep in path:
-        return True
-    return False
-
-
-def getStepDistance(prevStep, step):
-    if isBackStep(prevStep, step) == True:
-        return -1
-    elif isSideStep(prevStep, step) == True:
-        return 0
-    else:
-        return 1
-
 
 def stepsCount(path):
     steps = path.split(",")
-    prevStep = steps[0]
-    distance = 1
-    for step in steps[1:]:
-        distance += getStepDistance(prevStep, step)
-        prevStep = step
-    return distance
-'''
+    grid = HexGrid()
+    grid.path(steps)
+    return grid.distance()
+
+
 
 movement = { "n":  [  1, -1,  0 ],
              "ne": [  1,  0, -1 ],
@@ -70,21 +40,35 @@ class HexCell:
         return abs(max([self.x, self.y, self.z], key=abs))
 
 
+class HexGrid:
+    def __init__(self):
+        self.position = HexCell()
+        self.maxDistance = 0
 
-def stepsCount(path):
-    steps = path.split(",")
-    cell = HexCell()
-    maxCell = 0
-    for step in steps:
-        cell.move(step)
-        maxCell = max(maxCell, cell.distance())
-    return cell.distance(), maxCell
+
+    def path(self, steps):
+        for step in steps:
+            self.move(step)        
+
+
+    def move(self, direction):
+        self.position.move(direction)
+        self.maxDistance = max(self.maxDistance, self.position.distance())
+
+
+    def distance(self):
+        return self.position.distance()
+
 
 
 def main():
     with open("input11", "r") as f:
-        content = f.read().rstrip("\n")
-        print(stepsCount(content))
+        steps = f.read().rstrip("\n").split(",")
+        grid = HexGrid()
+        grid.path(steps)
+        print(grid.distance())
+        print(grid.maxDistance)
+
 
 
 if __name__ == "__main__":
