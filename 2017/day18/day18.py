@@ -1,3 +1,5 @@
+import collections
+
 def test_partA():
     program = [ "set a 1",
                 "add a 2",
@@ -27,75 +29,102 @@ def test_partB():
     assert(executeB(program) == 3)
 
 
-def executeA(program):
-    registers = {}
-    frequency = 0
-    cursor = 0
-    while True:
-        ops = program[cursor].split(" ")
-        op = ops[0]
-        reg = ops[1]
+class ThreadA:
+    def __init__(self):
+        self.registers = collections.defaultdict(int)
 
-        if op == "snd":
-            frequency = registers[reg]
-            cursor += 1
-        
-        elif op == "set":
-            value = ops[2]
-            try:
-                registers[reg] = int(value)
-            except ValueError:
-                registers[reg] = registers[value]
-            cursor += 1
-        
-        elif op == "add":
-            value = ops[2]
-            try:
-                value = int(value)
-            except ValueError:
-                value = registers[value]
-            registers[reg] += value
-            cursor += 1
-        
-        elif op == "mul":
-            if reg not in registers:
-                registers[reg] = 0
-            value = ops[2]
-            try:
-                value = int(value)
-            except ValueError:
-                value = registers[value]
-            registers[reg] *= value
-            cursor += 1
-        
-        elif op == "mod":
-            value = ops[2]
-            try:
-                value = int(value)
-            except ValueError:
-                value = registers[value]
-            registers[reg] %= value
-            cursor += 1
-        
-        elif op == "rcv":
-            if value != 0:
-                return frequency
-            cursor += 1
-        
-        elif op == "jgz":
-            value = ops[2]
-            if registers[reg] > 0:
-                try:
-                    value = int(value)
-                except ValueError:
-                    value = registers[value]
-                cursor += value
-            else:
-                cursor += 1
+
+    def get(self, value):
+        if value in "abcdefghijklmnopqrstuvwxyz":
+            return self.registers[value]
+        return int(value)
+
+
+    def execute(self, program):
+        frequency = 0
+        index = 0
+        while True:
+            instr = program[index].split(" ")
+            if instr[0] == "snd":
+                frequency = self.registers[instr[1]]        
+            elif instr[0] == "set":
+                self.registers[instr[1]] = self.get(instr[2])        
+            elif instr[0] == "add":
+                self.registers[instr[1]] += self.get(instr[2])        
+            elif instr[0] == "mul":
+                self.registers[instr[1]] *= self.get(instr[2])        
+            elif instr[0] == "mod":
+                self.registers[instr[1]] %= self.get(instr[2])        
+            elif instr[0] == "rcv":
+                if self.registers[instr[1]] != 0:
+                    return frequency        
+            elif instr[0] == "jgz":
+                if self.get(instr[1]) > 0:
+                    index += self.get(instr[2]) - 1
+            index += 1
+
+
+def executeA(program):
+    t = ThreadA()
+    res = t.execute(program)
+    return res
+
+
+
+class ThreadB:
+    def __init__(self, tid, program):
+        self.registers = collections.defaultdict(int)
+        self.registers["p"] = tid
+        self.index = 0
+        self.program = program
+        self.counter = 0
+        self.tid = tid
+
+
+    def get(self, value):
+        if value in "abcdefghijklmnopqrstuvwxyz":
+            return self.registers[value]
+        return int(value)
+
+
+    def execute(self, inqueue):
+        outqueue = []
+        while True:
+            instr = self.program[self.index].split(" ")
+            if instr[0] == "snd":
+                outqueue.append(self.registers[instr[1]])
+                self.counter += 1        
+            elif instr[0] == "set":
+                self.registers[instr[1]] = self.get(instr[2])        
+            elif instr[0] == "add":
+                self.registers[instr[1]] += self.get(instr[2])        
+            elif instr[0] == "mul":
+                self.registers[instr[1]] *= self.get(instr[2])        
+            elif instr[0] == "mod":
+                self.registers[instr[1]] %= self.get(instr[2])        
+            elif instr[0] == "rcv":
+                if not inqueue:
+                    return outqueue
+                else:
+                    self.registers[instr[1]] = inqueue.pop(0)        
+            elif instr[0] == "jgz":
+                if self.get(instr[1]) > 0:
+                    self.index += self.get(instr[2]) - 1
+            self.index += 1
+
 
 
 def executeB(program):
-    pass
+    a = ThreadB(0, program)
+    b = ThreadB(1, program)
+
+    queue = []
+    while True:
+        queue = a.execute(queue)
+        queue = b.execute(queue)
+
+        if not queue:
+            return b.counter
 
 
 def main():
