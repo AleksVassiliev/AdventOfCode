@@ -1,9 +1,15 @@
+import sys
+
+
 class Point:
     def __init__(self, x, y):
         self.x = x
         self.y = y
 
     def __str__(self):
+        return '({x}, {y})'.format(x=self.x, y=self.y)
+
+    def __repr__(self):
         return '({x}, {y})'.format(x=self.x, y=self.y)
 
     def distance(self):
@@ -49,8 +55,21 @@ class Segment:
             else:
                 point = Point(other.start.x, self.start.y)
             if self.contains(point) and other.contains(point):
-                return point
+                if point.x != 0 and point.y != 0:
+                    return point
         return None
+
+    def length(self, point=None):
+        if self.direction == 'horizontal':
+            if point is None:
+                return abs(self.end.x - self.start.x)
+            else:
+                return abs(point.x - self.start.x)
+        else:
+            if point is None:
+                return abs(self.end.y - self.start.y)
+            else:
+                return abs(point.y - self.start.y)
 
 
 class Wire:
@@ -62,6 +81,16 @@ class Wire:
             seg = Segment(point, path)
             self.segments.append(seg)
             point = seg.endpoint()
+
+    def distance(self, point):
+        distance = 0
+        for seg in self.segments:
+            if seg.contains(point):
+                distance += seg.length(point)
+                return distance
+            else:
+                distance += seg.length()
+        return distance
         
 
 def main():
@@ -69,18 +98,23 @@ def main():
     wireA = Wire(data[0])
     wireB = Wire(data[1])
 
-    distance = None
+    intersections = []
     for w0 in wireA.segments:
         for w1 in wireB.segments:
             res = w0.intersect(w1)
             if res is not None:
-                if res.distance() > 0:
-                    if distance is None:
-                        distance = res.distance()
-                    else:
-                        distance = min(distance, res.distance())
+                intersections.append(res)
 
+    distance = sys.maxsize
+    for p in intersections:
+        distance = min(distance, p.distance())
     print(distance)
+
+    distance = sys.maxsize
+    for p in intersections:
+        distance = min(distance, wireA.distance(p) + wireB.distance(p))
+    print(distance)
+
 
 if __name__ == '__main__':
     main()
