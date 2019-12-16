@@ -77,7 +77,7 @@ class Computer:
 
     def opcode7(self, instr):
         addr = self.data[self.instr_counter+3]
-        if self.get_value(self.instr_counter+1, instr.mode1) < self.get_value(self.instr_counter+1, instr.mode1):
+        if self.get_value(self.instr_counter+1, instr.mode1) < self.get_value(self.instr_counter+2, instr.mode2):
             self.data[addr] = 1
         else:
             self.data[addr] = 0
@@ -85,7 +85,7 @@ class Computer:
 
     def opcode8(self, instr):
         addr = self.data[self.instr_counter+3]
-        if self.get_value(self.instr_counter+1, instr.mode1) == self.get_value(self.instr_counter+1, instr.mode1):
+        if self.get_value(self.instr_counter+1, instr.mode1) == self.get_value(self.instr_counter+2, instr.mode2):
             self.data[addr] = 1
         else:
             self.data[addr] = 0
