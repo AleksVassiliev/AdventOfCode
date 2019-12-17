@@ -158,19 +158,20 @@ class Computer:
             self.opcode99(instr)
 
 
-def process1(data):
+def process(data, value):
     c = Computer(data)
-    c.add_input_param(1 )
+    c.add_input_param(value)
     while c.state != State.EHalted:
         c.process()
-    print(c.output_params[0])
+    return c.output_params[0]
 
 
 def main():
     content = open('input09').read().rstrip('\n').split(',')
     data = [ int(x) for x in content ]
 
-    process1(data)
+    print(process(data, 1))
+    print(process(data, 2))
     
     
 if __name__ == '__main__':
