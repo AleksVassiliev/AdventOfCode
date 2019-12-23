@@ -159,78 +159,27 @@ class Computer:
             self.opcode99(instr)
 
 
-class Direction(Enum):
-    T = 0,
-    B = 1,
-    L = 2,
-    R = 3
+class GameState:
+    def __init__(self):
+        self.ball = None
+        self.paddle = None
+        self.score = None
 
-class Robot:
-    map_moves = {
-        Direction.T: [ (Direction.L, -1, 0), (Direction.R, 1, 0) ],
-        Direction.B: [ (Direction.R, 1, 0), (Direction.L, -1, 0) ],
-        Direction.L: [ (Direction.B, 0, 1), (Direction.T, 0, -1) ],
-        Direction.R: [ (Direction.T, 0, -1), (Direction.B, 0, 1) ]
-    } 
-
-    def __init__(self, color):
-        self.coord = (0, 0)
-        self.grid = collections.defaultdict(int)
-        self.grid[self.coord] = color
-        self.direction = Direction.T
-    
-    def move(self, angle):
-        m = self.map_moves[self.direction][angle]
-        self.coord = (self.coord[0] + m[1], self.coord[1] + m[2])
-        self.direction = m[0]
-
-    def execute(self, program):
-        c = Computer(program)
-        op = collections.deque()
-        while c.state != State.EHalted:
-            if c.state == State.EWaitForInput:
-                param = self.grid[self.coord]
-                c.add_input_param(param)
-            elif c.state == State.ERaiseOutput:
-                op.append(c.output_params.popleft())
-                if len(op) == 2:
-                    self.grid[self.coord] = op.popleft()
-                    self.move(op.popleft())
-            c.process()
-        return len(self.grid.keys())
-
-    def dump(self):
-        xmin = sys.maxsize
-        xmax = 0
-        ymin = sys.maxsize
-        ymax = 0
-        for k in self.grid:
-            xmin, xmax = min(k[0], xmin), max(k[0], xmax)
-            ymin, ymax = min(k[1], ymin), max(k[1], ymax)
-
-        width = xmax - xmin + 1
-        height = ymax - ymin + 1
-        image = [ [' '] * width for i in range(height) ]
-
-        for k in self.grid:
-            if self.grid[k] == 1:
-                x = k[0] - xmin
-                y = k[1] - ymin
-                image[y][x] = '#'
-
-        for line in image:
-            linerepr = ''
-            for pixel in line:
-                linerepr += pixel
-            print(linerepr)
+    def process(self, params):
+        while len(params) != 0:
+            pos_x = params.popleft()
+            pos_y = params.popleft()
+            tile_id = params.popleft()
+            if tile_id == 3:
+                self.paddle = (pos_x, pos_y)
+            elif tile_id == 4:
+                self.ball = (pos_x, pos_y)
+            elif (pos_x == -1) and (pos_y == 0):
+                self.score = tile_id
 
 
-def main():
-    content = open('input13').read().rstrip('\n').split(',')
-    data = [ int(x) for x in content ]
-
-    c = Computer(data)
-    op = collections.deque()
+def part1(program):
+    c = Computer(program)
     while c.state != State.EHalted:
         c.process()
     
@@ -241,8 +190,33 @@ def main():
         tile_id = c.output_params.popleft()
         if tile_id == 2:
             block += 1
-    print(block)
+    return block
 
+
+def part2(program):
+    program[0] = 2
+    c = Computer(program)
+    gs = GameState()
+    while c.state != State.EHalted:
+        if c.state == State.EWaitForInput:
+            gs.process(c.output_params)
+            if gs.paddle[0] < gs.ball[0]:
+                c.add_input_param(1)
+            elif gs.paddle[0] > gs.ball[0]:
+                c.add_input_param(-1)
+            else:
+                c.add_input_param(0)
+        c.process()
+    gs.process(c.output_params)
+    return gs.score
+
+    
+def main():
+    content = open('input13').read().rstrip('\n').split(',')
+    data = [ int(x) for x in content ]
+
+    print(part1(data))
+    print(part2(data))
 
 
 if __name__ == '__main__':
