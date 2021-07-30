@@ -1,6 +1,3 @@
-import itertools
-
-
 def check_password_v1(policy: str, password: str):
     numbers, letter = policy.split(' ')
     min_num, max_num = numbers.split('-')
@@ -29,7 +26,7 @@ def check_passwords(passwords: list, check_func):
 
 
 def main():
-    passwords = [line.strip() for line in open('./input.txt')]
+    passwords = [line.strip() for line in open('./input02.txt')]
     result_v1 = check_passwords(passwords, check_password_v1)
     print(result_v1)
     result_v2 = check_passwords(passwords, check_password_v2)
