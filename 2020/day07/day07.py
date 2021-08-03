@@ -1,6 +1,3 @@
-from collections import defaultdict
-
-
 def parse_rules(data):
     rules = {}
     for line in data:
