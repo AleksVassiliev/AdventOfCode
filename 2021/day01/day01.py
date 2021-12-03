@@ -1,6 +1,3 @@
-import itertools
-
-
 def calculate_report_v1(report: list):
     prev_value = report[0]
     measurements = 0
