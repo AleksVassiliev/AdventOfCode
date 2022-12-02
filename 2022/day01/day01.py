@@ -26,7 +26,7 @@ def calculate_calories_v2(data):
 
 
 def main():
-    data = [line.strip() for line in open('./input01.txt')]
+    data = [line.strip() for line in open('./input.txt')]
     result_v1 = calculate_calories_v1(data)
     print(result_v1)
     result_v2 = calculate_calories_v2(data)
