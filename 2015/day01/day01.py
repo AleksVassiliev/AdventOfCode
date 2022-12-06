@@ -1,4 +1,4 @@
-def calculateA(data):
+def solve_v1(data):
     res = 0
     for c in data:
         if c == '(':
@@ -8,7 +8,7 @@ def calculateA(data):
     return res
 
 
-def calculateB(data):
+def solve_v2(data):
     res = 0
     for idx, c in enumerate(data):
         if c == '(':
@@ -16,16 +16,17 @@ def calculateB(data):
         elif c == ')':
             res -= 1
         if res == -1:
-            return (idx+1)
+            return (idx + 1)
     return 0
 
 
 def main():
-    with open("input01", "r") as f:
+    with open("input.txt", "r") as f:
         data = f.read()
-        res1 = calculateA(data)
-        res2 = calculateB(data)
-        print(res1, res2)
+        res1 = solve_v1(data)
+        print(res1)
+        res2 = solve_v2(data)
+        print(res2)
 
 
 if __name__ == "__main__":
