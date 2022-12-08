@@ -1,35 +1,32 @@
 import hashlib
 
 
-def hash5(data):
+def calculate_hash(data, prefix):
     idx = 0
     while True:
-        m = hashlib.md5()
         idx += 1
-        input_string = "{}{}".format(data, idx)
+        input_string = f'{data}{idx}'
+        m = hashlib.md5()
         m.update(input_string.encode())
         hash_string = m.hexdigest()
-        if hash_string.startswith("00000"):
+        if hash_string.startswith(prefix):
             return idx
 
 
-def hash6(data):
-    idx = 0
-    while True:
-        m = hashlib.md5()
-        idx += 1
-        input_string = "{}{}".format(data, idx)
-        m.update(input_string.encode())
-        hash_string = m.hexdigest()
-        if hash_string.startswith("000000"):
-            return idx
+def calculate_hash_v1(data):
+    return calculate_hash(data, '00000')
+
+
+def calculate_hash_v2(data):
+    return calculate_hash(data, '000000')
 
 
 def main():
-    data = "bgvyzdsv"
-    res1 = hash5(data)
-    res2 = hash6(data)
-    print(res1, res2)
+    data = 'bgvyzdsv'
+    res1 = calculate_hash_v1(data)
+    print(res1)
+    res2 = calculate_hash_v2(data)
+    print(res2)
 
 
 if __name__ == "__main__":

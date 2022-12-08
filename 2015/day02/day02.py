@@ -26,7 +26,7 @@ def calculate_v2(data):
 
 
 def main():
-    data = [ line.rstrip('\n') for line in open('input.txt') ]
+    data = [line.rstrip('\n') for line in open('input.txt')]
     res1 = calculate_v1(data)
     print(res1)
     res2 = calculate_v2(data)

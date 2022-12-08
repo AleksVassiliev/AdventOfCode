@@ -1,65 +1,53 @@
 class Position:
     def __init__(self, x, y):
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
 
     def move(self, direction):
         if direction == '^':
-            self.moveN()
+            self._y += 1
         elif direction == 'v':
-            self.moveS()
+            self._y -= 1
         elif direction == '>':
-            self.moveE()
+            self._x += 1
         elif direction == '<':
-            self.moveW()
+            self._x -= 1
 
-    def moveN(self):
-        self.y += 1
-
-    def moveS(self):
-        self.y -= 1
-
-    def moveW(self):
-        self.x -= 1
-    
-    def moveE(self):
-        self.x += 1
-
-    def pos(self):
-        return "{}:{}".format(self.x, self.y)
+    @property
+    def position(self):
+        return f'{self._x}:{self._y}'
 
 
-def calculateA(data):
+def count_houses_v1(data):
     houses = set()
     pos = Position(0, 0)
-    houses.add(pos.pos())
+    houses.add(pos.position)
     for d in data:
         pos.move(d)
-        houses.add(pos.pos())
+        houses.add(pos.position)
     return len(houses)
 
 
-def calculateB(data):
+def count_houses_v2(data):
     houses = set()
     posS = Position(0, 0)
     posR = Position(0, 0)
-    houses.add(posS.pos())
-    for idx, d in enumerate(data):
-        if idx % 2 == 0:
-            posS.move(d)
-            houses.add(posS.pos())
-        else:
-            posR.move(d)
-            houses.add(posR.pos())
+    houses.add(posS.position)
+    for i in range(0, len(data)-1, 2):
+        posS.move(data[i])
+        houses.add(posS.position)
+        posR.move(data[i+1])
+        houses.add(posR.position)
     return len(houses)
 
 
 def main():
-    with open("input03") as f:
-        data = f.read()
-        res1 = calculateA(data)
-        res2 = calculateB(data)
-        print(res1, res2)
+    with open('./input.txt') as fi:
+        data = fi.readline()
+        res1 = count_houses_v1(data)
+        print(res1)
+        res2 = count_houses_v2(data)
+        print(res2)
 
 
 if __name__ == "__main__":
