@@ -3,9 +3,8 @@ class Circuit:
         self.wires = {}
         self.results = {}
         for item in circuit:
-            l, wire = item.split(" -> ")
-            self.wires[wire] = l.split(" ")
-
+            l, wire = item.split(' -> ')
+            self.wires[wire] = l.split(' ')
 
     def get_signal(self, wire):
         try:
@@ -17,31 +16,30 @@ class Circuit:
                     res = self.get_signal(ops[0])
                 else:
                     op = ops[-2]
-                    if op == "NOT":
+                    if op == 'NOT':
                         res = ~self.get_signal(ops[1]) & 0xffff
-                    elif op == "AND":
+                    elif op == 'AND':
                         res = self.get_signal(ops[0]) & self.get_signal(ops[2])
-                    elif op == "OR":
+                    elif op == 'OR':
                         res = self.get_signal(ops[0]) | self.get_signal(ops[2])
-                    elif op == "LSHIFT":
+                    elif op == 'LSHIFT':
                         res = self.get_signal(ops[0]) << self.get_signal(ops[2])
-                    elif op == "RSHIFT":
+                    elif op == 'RSHIFT':
                         res = self.get_signal(ops[0]) >> self.get_signal(ops[2])
                 self.results[wire] = res
             return self.results[wire]
 
 
-
 def main():
-    data = [ line.rstrip("\n") for line in open("input07") ]
+    data = [line.rstrip('\n') for line in open('./input.txt')]
 
     c = Circuit(data)
-    res1 = c.get_signal("a")
+    res1 = c.get_signal('a')
     print(res1)
     
     c.results.clear()
-    c.results["b"] = res1
-    res2 = c.get_signal("a")
+    c.results['b'] = res1
+    res2 = c.get_signal('a')
     print(res2)
 
 
