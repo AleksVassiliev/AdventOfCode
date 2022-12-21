@@ -20,8 +20,8 @@ data = [
 
 
 def test_part1():
-    assert(day15.check_row_v1(data, 10) == 26)
+    assert(day15.check_row(data, 10) == 26)
 
 
-#def test_part2():
-#    assert(day14.count_sands_v2(data) == 93)
+def test_part2():
+    assert(day15.find_position(data, 20) == 56000011)
